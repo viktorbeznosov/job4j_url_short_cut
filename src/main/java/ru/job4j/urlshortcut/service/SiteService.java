@@ -1,7 +1,7 @@
 package ru.job4j.urlshortcut.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;  // Изменен импорт
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.job4j.urlshortcut.model.Site;
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class SiteService {
 
     private final SiteRepository siteRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;  // Изменено с BCryptPasswordEncoder на PasswordEncoder
 
     @Transactional
     public Site register(String siteName) {
@@ -34,8 +34,16 @@ public class SiteService {
         site.setPasswordHash(passwordHash);
 
         Site savedSite = siteRepository.save(site);
-        savedSite.setPasswordHash(password);
-        return savedSite;
+
+        // Для ответа создайте новый объект или DTO, не изменяйте savedSite
+        Site responseSite = new Site();
+        responseSite.setId(savedSite.getId());
+        responseSite.setSite(savedSite.getSite());
+        responseSite.setLogin(savedSite.getLogin());
+        responseSite.setPasswordHash(password);  // Открытый пароль только для ответа
+        responseSite.setCreatedAt(savedSite.getCreatedAt());
+
+        return responseSite;
     }
 
     public Optional<Site> findByLogin(String login) {

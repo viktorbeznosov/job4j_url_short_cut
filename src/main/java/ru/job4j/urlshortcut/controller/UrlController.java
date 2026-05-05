@@ -1,6 +1,7 @@
 package ru.job4j.urlshortcut.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import ru.job4j.urlshortcut.service.UrlService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
@@ -40,8 +42,9 @@ public class UrlController {
 
     @GetMapping("/redirect/{code}")
     public ResponseEntity<Void> redirect(@PathVariable String code) {
+        log.info(" =================== CODE ================ {}", code);
         return urlService.redirect(code)
-                .map(url -> ResponseEntity.status(302).header("Location", url).build())
+                .map(url -> ResponseEntity.status(302).header("Location", url).<Void>build())
                 .orElse(ResponseEntity.notFound().build());
     }
 }
