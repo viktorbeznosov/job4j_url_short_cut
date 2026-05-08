@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -39,7 +40,17 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String token, java.util.function.Function<Claims, T> claimsResolver) {
+    public boolean isTokenValid(String token, String login) {
+        String extractedLogin = extractLogin(token);
+        return extractedLogin.equals(login) && !isTokenExpired(token);
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String login = extractLogin(token);
+        return (login.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -58,15 +69,5 @@ public class JwtService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
-    }
-
-    public boolean isTokenValid(String token, String login) {
-        String extractedLogin = extractLogin(token);
-        return extractedLogin.equals(login) && !isTokenExpired(token);
-    }
-
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String login = extractLogin(token);
-        return (login.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 }

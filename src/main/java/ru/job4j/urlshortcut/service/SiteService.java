@@ -1,44 +1,41 @@
 package ru.job4j.urlshortcut.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;  // Изменен импорт
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.job4j.urlshortcut.dto.RegistrationResponse;
+import ru.job4j.urlshortcut.mapper.SiteMapper;
 import ru.job4j.urlshortcut.model.Site;
 import ru.job4j.urlshortcut.repository.SiteRepository;
+import ru.job4j.urlshortcut.dto.RegistrationRequest;
+
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class SiteService {
 
     private final SiteRepository siteRepository;
-    private final PasswordEncoder passwordEncoder;  // Изменено с BCryptPasswordEncoder на PasswordEncoder
+    private final PasswordEncoder passwordEncoder;
+    private final SiteMapper siteMapper;
 
     @Transactional
-    public Site register(String siteName) {
+    public RegistrationResponse register(String siteName) {
         String login = UUID.randomUUID().toString();
         String password = UUID.randomUUID().toString();
         String passwordHash = passwordEncoder.encode(password);
 
-        Site site = new Site();
-        site.setSite(siteName);
+        Site site = siteMapper.toEntity(new RegistrationRequest(siteName));
         site.setLogin(login);
         site.setPasswordHash(passwordHash);
+        site = siteRepository.save(site);
 
-        Site savedSite = siteRepository.save(site);
-
-        // Для ответа создайте новый объект или DTO, не изменяйте savedSite
-        Site responseSite = new Site();
-        responseSite.setId(savedSite.getId());
-        responseSite.setSite(savedSite.getSite());
-        responseSite.setLogin(savedSite.getLogin());
-        responseSite.setPasswordHash(password);  // Открытый пароль только для ответа
-        responseSite.setCreatedAt(savedSite.getCreatedAt());
-
-        return responseSite;
+        return new RegistrationResponse(true, login, password);
     }
 
     public Optional<Site> findByLogin(String login) {

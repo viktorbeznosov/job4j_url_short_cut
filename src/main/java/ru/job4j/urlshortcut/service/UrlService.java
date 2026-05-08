@@ -1,34 +1,42 @@
 package ru.job4j.urlshortcut.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.job4j.urlshortcut.dto.ConvertRequest;
+import ru.job4j.urlshortcut.dto.ConvertResponse;
+import ru.job4j.urlshortcut.dto.StatisticItem;
+import ru.job4j.urlshortcut.mapper.UrlMapper;
 import ru.job4j.urlshortcut.model.Url;
 import ru.job4j.urlshortcut.repository.UrlRepository;
+import ru.job4j.urlshortcut.model.Site;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UrlService {
 
     private final UrlRepository urlRepository;
+    private final UrlMapper urlMapper;
 
     @Transactional
-    public Url convertUrl(String originalUrl, Long siteId) {
+    public ConvertResponse convertUrl(String originalUrl, Long siteId) {
         String code = generateShortCode();
 
-        Url url = new Url();
-        url.setOriginalUrl(originalUrl);
+        Url url = urlMapper.toEntity(new ConvertRequest(originalUrl));
         url.setCode(code);
         url.setTotalVisits(0L);
-        url.setSite(new ru.job4j.urlshortcut.model.Site());
+        url.setSite(new Site());
         url.getSite().setId(siteId);
 
-        return urlRepository.save(url);
+        url = urlRepository.save(url);
+
+        return urlMapper.toConvertResponse(url);
     }
 
     @Transactional
@@ -43,15 +51,15 @@ public class UrlService {
         return Optional.empty();
     }
 
-    public List<Url> getStatistics(Long siteId) {
-        return urlRepository.findBySiteId(siteId);
+    public List<StatisticItem> getStatistics(Long siteId) {
+        return urlRepository.findBySiteId(siteId).stream()
+                .map(urlMapper::toStatisticItem)
+                .collect(Collectors.toList());
     }
 
     private String generateShortCode() {
         byte[] bytes = new byte[6];
-        UUID.randomUUID().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(
-                java.security.SecureRandom.getSeed(6)
-        ).substring(0, 6);
+        new java.security.SecureRandom().nextBytes(bytes);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).substring(0, 6);
     }
 }
