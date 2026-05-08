@@ -20,9 +20,6 @@ public class UrlService {
     @Transactional
     public Url convertUrl(String originalUrl, Long siteId) {
         String code = generateShortCode();
-        while (urlRepository.findByCode(code).isPresent()) {
-            code = generateShortCode();
-        }
 
         Url url = new Url();
         url.setOriginalUrl(originalUrl);
@@ -36,11 +33,13 @@ public class UrlService {
 
     @Transactional
     public Optional<String> redirect(String code) {
-        Optional<Url> urlOptional = urlRepository.findByCode(code);
-        if (urlOptional.isPresent()) {
-            urlRepository.incrementVisits(code);
-            return Optional.of(urlOptional.get().getOriginalUrl());
+        int updatedRows = urlRepository.incrementVisits(code);
+
+        if (updatedRows > 0) {
+            return urlRepository.findByCode(code)
+                .map(Url::getOriginalUrl);
         }
+
         return Optional.empty();
     }
 

@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.job4j.urlshortcut.controller.dto.RegistrationRequest;
-import ru.job4j.urlshortcut.controller.dto.RegistrationResponse;
+import ru.job4j.urlshortcut.dto.RegistrationRequest;
+import ru.job4j.urlshortcut.dto.RegistrationResponse;
 import ru.job4j.urlshortcut.service.SiteService;
 
 @Slf4j

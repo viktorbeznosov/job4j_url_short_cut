@@ -19,11 +19,6 @@ public class SiteService {
 
     @Transactional
     public Site register(String siteName) {
-        Optional<Site> existingSite = siteRepository.findBySite(siteName);
-        if (existingSite.isPresent()) {
-            return existingSite.get();
-        }
-
         String login = UUID.randomUUID().toString();
         String password = UUID.randomUUID().toString();
         String passwordHash = passwordEncoder.encode(password);

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.job4j.urlshortcut.controller.dto.AuthRequest;
-import ru.job4j.urlshortcut.controller.dto.AuthResponse;
+import ru.job4j.urlshortcut.dto.AuthRequest;
+import ru.job4j.urlshortcut.dto.AuthResponse;
 import ru.job4j.urlshortcut.service.JwtService;
 import ru.job4j.urlshortcut.service.SiteService;
 

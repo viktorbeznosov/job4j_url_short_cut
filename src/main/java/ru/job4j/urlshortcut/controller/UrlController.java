@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import ru.job4j.urlshortcut.controller.dto.ConvertRequest;
-import ru.job4j.urlshortcut.controller.dto.ConvertResponse;
-import ru.job4j.urlshortcut.controller.dto.StatisticItem;
+import ru.job4j.urlshortcut.dto.ConvertRequest;
+import ru.job4j.urlshortcut.dto.ConvertResponse;
+import ru.job4j.urlshortcut.dto.StatisticItem;
 import ru.job4j.urlshortcut.model.Url;
 import ru.job4j.urlshortcut.service.UrlService;
 
